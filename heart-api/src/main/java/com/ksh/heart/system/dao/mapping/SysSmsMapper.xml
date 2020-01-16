@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.heart.system.dao.SysSmsMapper">
+
+	<!--    查询条件-->
+	<sql id="Where_List">
+		<if test="phone != null and phone != ''">
+			and ss.phone =  #{phone,jdbcType=VARCHAR}
+		</if>
+		<if test="type != null and type != ''">
+			and ss.type =  #{type,jdbcType=VARCHAR}
+		</if>
+	</sql>
+
+	<!-- 60秒发送一个验证码 -->
+	<select id="selectMinutesCode" resultType="int">
+		select count(*) from sys_sms ss
+		where ss.create_time > DATE_SUB(NOW(), INTERVAL 1 MINUTE)
+		<include refid="Where_List"/>
+	</select>
+
+    <!-- 每天验证码次数 -->
+    <select id="selectDayCode" resultType="int">
+		select count(*) from sys_sms ss
+		where ss.create_time > DATE_SUB(NOW(), INTERVAL 1 DAY)
+		<include refid="Where_List"/>
+	</select>
+
+	<!-- 每小时验证码次数 -->
+	<select id="selectHoursCode" resultType="int">
+		select count(*) from sys_sms ss
+		where ss.create_time > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+		<include refid="Where_List"/>
+	</select>
+
+	<!-- 每半个时验证码次数 -->
+	<select id="selectHalfHoursCode" resultType="int">
+		select count(*) from sys_sms ss
+		where ss.create_time > DATE_SUB(NOW(), INTERVAL 30 MINUTE)
+		<include refid="Where_List"/>
+	</select>
+
+	<!-- 验证码是否有效 -->
+	<select id="selectVerifyCode" resultType="com.ksh.heart.system.entity.sys.Sms">
+		select ss.* from sys_sms ss
+		where ss.create_time > DATE_SUB(NOW(), INTERVAL 5 MINUTE) and ss.status = 1
+		and ss.code =  #{code,jdbcType=VARCHAR} and ss.type =  #{type,jdbcType=VARCHAR}
+	</select>
+</mapper>

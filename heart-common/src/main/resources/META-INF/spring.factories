@@ -1,0 +1,5 @@
+# AutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.ksh.heart.common.config.DefaultFastjsonConfig,\
+com.ksh.heart.common.config.properties.DefaultProperties
+

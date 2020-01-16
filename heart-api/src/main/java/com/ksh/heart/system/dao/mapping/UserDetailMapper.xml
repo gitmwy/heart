@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.heart.system.dao.UserDetailMapper">
+
+    <!-- 查询角色最低级别 -->
+    <select id="getRoleByLevel" resultType="int">
+		select max(ur.level) from user_role ur
+	</select>
+
+	<!-- 查询用户 -->
+	<select id="getUserByAccount" resultType="com.ksh.heart.system.entity.user.User">
+		select ud.*,ur.level,ua.area_name from user_detail ud
+			LEFT JOIN user_role ur on ud.role_id = ur.id
+			LEFT JOIN user_area ua on ud.area_id = ua.id
+		where ud.phone = #{account}
+	</select>
+
+	<!--	根据用户区域ID获取其下属所有区域ID-->
+	<select id="selectAllAreaByAreaId" resultType="long">
+    <![CDATA[
+        select id from (
+              select
+              	t1.id,
+              	if(find_in_set(parent_id, @pids) > 0, @pids := concat(@pids, ',', id), 0) as ischild
+              from
+              	(select id,parent_id from user_area t order by parent_id, id) t1,
+        		(select @pids := #{id}) t2
+		 ) t3 where ischild != 0
+    ]]>
+    </select>
+
+	<!-- 根据用户角色等级获取下属所有员工 -->
+	<select id="selectUserTotal" resultType="com.ksh.heart.system.entity.user.User">
+		select ud.*,ur.level from user_detail ud
+			LEFT JOIN user_role ur on ud.role_id = ur.id
+		where ur.level > #{level}
+			and ud.area_id in <foreach collection="areaIds" item="id" index="index" open="(" close=")" separator=","> #{id} </foreach>
+	</select>
+
+	<!-- 员工管理 -->
+	<select id="selectUserList" resultType="com.ksh.heart.system.entity.user.User">
+		select ud.*,ur.level from user_detail ud
+		LEFT JOIN user_role ur on ud.role_id = ur.id
+		where ur.level > #{level}
+			and ud.area_id in <foreach collection="areaIds" item="id" index="index" open="(" close=")" separator=","> #{id} </foreach>
+	</select>
+
+	<!-- 员工管理详情 -->
+	<select id="selectUserInfo" resultType="com.ksh.heart.system.entity.user.User">
+		select ud.*,ur.level,ua.area_name from user_detail ud
+			LEFT JOIN user_role ur on ud.role_id = ur.id
+			LEFT JOIN user_area ua on ud.area_id = ua.id
+		where ud.id = #{id}
+	</select>
+
+	<!-- 员工统计 -->
+	<select id="selectUserCount" resultType="int">
+		select count(*) from user_detail ud
+		LEFT JOIN user_role ur on ud.role_id = ur.id
+		where ur.level > #{level}
+	</select>
+</mapper>

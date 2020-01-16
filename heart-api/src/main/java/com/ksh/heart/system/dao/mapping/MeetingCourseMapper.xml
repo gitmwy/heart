@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ksh.heart.system.dao.MeetingCourseMapper">
+
+    <!--    分页-->
+    <select id="selectPageList" resultType="com.ksh.heart.system.entity.meeting.Course">
+        select m.* from meeting_course m order by m.create_time desc
+    </select>
+</mapper>

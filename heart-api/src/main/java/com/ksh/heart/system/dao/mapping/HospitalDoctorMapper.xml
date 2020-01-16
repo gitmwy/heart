@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ksh.heart.system.dao.HospitalDoctorMapper">
+
+    <!--    查询条件-->
+    <sql id="Where_List">
+        <if test="doctor.name != null and doctor.name != ''">
+            and d.name like concat("%",#{doctor.name},"%")
+        </if>
+         <if test="doctor.phone != null and doctor.phone != ''">
+            and d.phone like concat("%",#{doctor.phone},"%")
+        </if>
+    </sql>
+
+    <!--    分页-->
+    <select id="selectPageList" resultType="com.ksh.heart.system.entity.hospital.Doctor">
+        select d.* from hospital_doctor d
+        <where>
+            1 = 1 <include refid="Where_List"/>
+        </where>
+        order by d.create_time desc
+    </select>
+
+    <!-- 讲者管理 -->
+    <select id="selectDoctorList" resultType="com.ksh.heart.system.entity.hospital.Doctor">
+        SELECT hdr.* FROM hospital_doctor hdr
+        WHERE hdr.hospital_id IN ( SELECT id FROM hospital_detail WHERE
+        managers_id in <foreach collection="managersIds" item="id" index="index" open="(" close=")" separator=","> #{id} </foreach>
+        ) AND hdr.flag = 1
+	</select>
+
+    <!-- 讲者管理详情 -->
+    <select id="selectDoctorInfo" resultType="com.ksh.heart.system.entity.hospital.Doctor">
+        SELECT
+            hdr.*, hdl.NAME hospital_name, hdl.area_name, hdl.address
+        FROM
+            hospital_doctor hdr
+            LEFT JOIN ( SELECT d.*, a.area_name FROM hospital_detail d LEFT JOIN hospital_area a ON d.area_id = a.id ) hdl ON hdr.hospital_id = hdl.id
+        WHERE hdr.id = #{id}
+    </select>
+
+    <!-- 讲者统计 -->
+    <select id="selectDoctorCount" resultType="int">
+        SELECT count(*) FROM hospital_doctor hdr
+        WHERE hdr.hospital_id IN ( SELECT id FROM hospital_detail WHERE
+        managers_id in <foreach collection="managersIds" item="id" index="index" open="(" close=")" separator=","> #{id} </foreach>
+        ) AND hdr.flag = 1
+	</select>
+</mapper>

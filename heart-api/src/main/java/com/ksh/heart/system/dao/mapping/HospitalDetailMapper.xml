@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ksh.heart.system.dao.HospitalDetailMapper">
+
+    <!-- 分页-->
+    <select id="selectPageList" resultType="com.ksh.heart.system.entity.hospital.Hospital">
+        select h.*, ha.area_name from hospital_detail h
+        left join hospital_area ha on h.area_id = ha.id
+        where h.managers_id in <foreach collection="managersIds" item="id" index="index" open="(" close=")" separator=","> #{id} </foreach>
+        order by h.create_time desc
+    </select>
+
+    <!--医院管理详情-->
+    <select id="selectHospitalInfo" resultType="com.ksh.heart.system.entity.hospital.Hospital">
+        select hd.*, ha.area_name from hospital_detail hd
+        left join hospital_area ha on hd.area_id = ha.id
+        where hd.id = #{id}
+    </select>
+</mapper>
