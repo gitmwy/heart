@@ -110,20 +110,7 @@ public class LoginController extends BaseController {
         //登录验证
         User user = ConstantFactory.me().getUserByAccount(loginForm.getUsername());
         if (null == user) {
-            user = new User();
-            user.setAreaId(2L);
-            user.setRoleId(2L);
-            user.setStatus(1);
-            user.setUsername("test");
-            user.setSex(1);
-            user.setJobCode("000000");
-            user.setPassword("66c1a54043ca91ebd33ca39c1ebdb414");
-            user.setSalt("d8b61e3e10124e17a2f1");
-            user.setPhone(loginForm.getUsername());
-            if(userDetailService.save(user)){
-                user = ConstantFactory.me().getUserByAccount(user.getPhone());
-            }
-//            return R.fail("账号不存在");
+            return R.fail("账号不存在");
         }
         if("01".equals(loginForm.getLoginType())){
             //账号密码登陆
